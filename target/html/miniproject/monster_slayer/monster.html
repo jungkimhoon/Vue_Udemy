@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Monster Slayer</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <script src="https://npmcdn.com/vue/dist/vue.js"></script>
+    <link rel="stylesheet" href="css/foundation.min.css">
+    <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+<div id="app">
+    <section class="row">
+        <div class="small-6 columns">
+            <h1 class="text-center">YOU</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" :style="[{backgroundColor: 'green'}, {margin: 0}, {color: 'white'}, {width : me+'%'}]">
+                    {{me}}
+                </div>
+            </div>
+        </div>
+        <div class="small-6 columns">
+            <h1 class="text-center">MONSTER</h1>
+            <div class="healthbar">
+                <div class="healthbar text-center" :style="[{backgroundColor: 'green'}, {margin: 0}, {color: 'white'}, {width : monster+'%'}]">
+                    {{ monster }}
+                </div>
+            </div>
+        </div>
+    </section>
+    <section class="row controls" v-if="!game">
+        <div class="small-12 columns" >
+            <button id="start-game" @click="startNewGame" >START NEW GAME</button>
+        </div>
+    </section>
+    <section class="row controls" v-if="game">
+        <div class="small-12 columns">
+            <button id="attack" @click="attack">ATTACK</button>
+            <button id="special-attack" @click="specialAttack">SPECIAL ATTACK</button>
+            <button id="heal" @click="heal">HEAL</button>
+            <button id="give-up" @click="giveUp">GIVE UP</button>
+        </div>
+    </section>
+    <section class="row log" v-if="game">
+        <div class="small-12 columns">
+            <ul >
+                <li v-for="text in record" :class="{'player-turn': text.isPlayer, 'monster-turn': !text.isPlayer}">
+                    {{ text.text }}
+                </li>
+            </ul>
+        </div>
+    </section>
+</div>
+</body>
+<script>
+    new Vue({
+        el : '#app',
+        data : {
+            me : '',
+            monster : '',
+            game : false,
+            record : []
+        },
+        methods : {
+            startNewGame : function(){
+                this.game = true;
+                this.me = 100;
+                this.monster = 100;
+
+            },
+            attack : function(){
+                let dmg = Math.floor(Math.random() * 5);
+                this.me -= dmg;
+                this.record.unshift({
+                    isPlayer: true,
+                    text: 'Player hits Monster for ' + dmg
+                });
+                dmg = Math.floor(Math.random() * 6);
+                this.monster -=  Math.floor(Math.random() * 6);
+                this.record.unshift({
+                    isPlayer: false,
+                    text: 'Monster hits Player for ' + dmg
+                });
+                this.checkWin();
+            },
+            specialAttack : function(){
+                let dmg = Math.floor(Math.random() * 15);
+                this.me -= dmg;
+                this.record.unshift({
+                    isPlayer: true,
+                    text: 'Player hits Monster hard for ' + dmg
+                });
+                dmg = Math.floor(Math.random() * 17);
+                this.monster -= dmg;
+                this.record.unshift({
+                    isPlayer: false,
+                    text: 'Monster hits Player hard for ' + dmg
+                });
+                this.checkWin();
+
+            },
+            heal : function(){
+                if(this.game) {
+                    if(this.me < 90) {
+                        this.me += 2;
+                        this.monster += 1;
+                        this.record.unshift({
+                            isPlayer: true,
+                            text: 'Heal 2'
+                        });
+                    }
+                }
+            },
+            giveUp : function(){
+                if(this.game) {
+                    alert('You lose');
+                    this.resetGame();
+                }
+            },
+            checkWin : function(){
+                if(this.me <= 0) {
+                    if(this.game) {
+                        alert('You lose');
+                        this.resetGame();
+                    }
+                }
+                if(this.monster <= 0) {
+                    if(this.game) {
+                        alert('You Win!!!')
+                        this.resetGame();
+                    }
+                }
+            },
+            resetGame : function(){
+                this.me = '';
+                this.monster = '';
+                this.game = false;
+                this.record = [];
+            }
+        }
+
+    })
+
+</script>
+</html>
