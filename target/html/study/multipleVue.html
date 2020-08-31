@@ -7,33 +7,48 @@
 </head>
 <body>
 <div id="app1">
-    <h1>{{ title }}</h1>
-    <button v-on:click="show">Show Paragraph</button>
+    <h1 ref="heading" v-html="title">{{ title }}</h1>
+    <button v-on:click="show" ref="myButton">Show Paragraph</button>
     <p v-if="showParagraph">This is not always visible</p>
 </div>
 
 <div id="app2">
     <h1>{{ title }}</h1>
     <button @click="onChange">Change something in Vue 1</button>
+   <!--
+   <hello></hello>
+    <hello></hello>
+    -->
 </div>
+
+<div id="app3">
+
+</div>
+
 </body>
 <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
 <script>
-    let data = {
+    var data = {
         title: 'the VueJS Instance',
-            showParagraph : false
+        showParagraph : false
     }
+/*
+    Vue.component('hello', {
+        template : '<h1>Hello!</h1>'
+    });
 
-   let vm1 = new Vue({
-       el : '#app1',
-       data : data
-       ,
+ */
+
+
+   var vm1 = new Vue({
+       data : data,
         methods:{
            show: function(){
                this.showParagraph = true;
-               this.updateTitle('The VueJS Instance (Updated)')
+               this.updateTitle('The VueJS Instance (Updated)');
+               this.$refs.myButton.innerText = 'test';
            },
-           updateTitle: function(title){
+            updateTitle: function(title){
                this.title = title;
            }
         },
@@ -49,14 +64,18 @@
         }
     });
 
-   console.log(vm1.$data === data)
+    vm1.$mount('#app1');
 
-   setTimeout(function(){
+   console.log(vm1.$data === data);
+    vm1.$refs.heading.innerText = 'wow';
+
+
+    setTimeout(function(){
        vm1.title = 'Changed by Timer';
        vm1.show();
    }, 3000);
 
-    let vm2 = new Vue({
+    var vm2 = new Vue({
        el : '#app2',
         data: {
            title : 'the second Instance'
@@ -67,6 +86,13 @@
            }
         }
     });
+
+    var vm3 = new Vue({
+        template: '<h1>hello!</h1>'
+    })
+
+    vm3.$mount();
+    document.getElementById('app3').appendChild(vm3.$el);
 </script>
 
 </html>
