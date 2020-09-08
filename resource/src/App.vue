@@ -12,6 +12,13 @@
 					<input type="text" class="form-control" v-model="user.email">
 				</div>
 				<button class="btn btn-primary" @click="submit">Submit</button>
+				<hr>
+				<input class="form-control" type="text" v-model="node">
+				<button class="btn btn-primary" @click="fetchData">Get Data</button>
+				<br><br>
+				<ul class="list-group">
+					<li class="list-group-item" v-for="u in users">{{ u.username }} - {{ u.email }}</li>
+				</ul>
             </div>
         </div>
     </div>
@@ -24,19 +31,58 @@
     			user: {
     				username: '',
 					email: ''
-				}
+				},
+				users: [],
+				resource: {},
+				node: 'data'
 			};
 		},
 		methods : {
     		submit(){
-    			console.log(this.user);
-    			this.$http.post('https://vuejs-http-e345c.firebaseio.com/data.json', this.user)
+    			// console.log(this.user);
+    			// this.$http.post('data.json', this.user)
+				// 	.then(response => {
+				// 		console.log(response);
+				// 	}, error => {
+				// 		console.log(response);
+				// 	});
+				
+				// this.resource.save({}, this.user);
+			
+				this.resource.saveAlt(this.user);
+			},
+			fetchData(){
+    			// this.$http.get('data.json')
+				// 	.then(response => {
+				// 		return response.json();
+				// 	})
+				// 	.then(data => {
+				// 		const resultArray = [];
+				// 		for(let key in data){
+				// 			resultArray.push(data[key]);
+				// 		}
+				// 		this.users = resultArray;
+				// 	});
+				
+				this.resource.getData({node: this.node, another: 'data'})
 					.then(response => {
-						console.log(response);
-					}, error => {
-						console.log(response);
+						return response.json();
+					})
+					.then(data => {
+						const resultArray = [];
+						for(let key in data){
+							resultArray.push(data[key]);
+						}
+						this.users = resultArray;
 					});
 			}
+		},
+		created(){
+    		const custonActions = {
+				saveAlt: {method: 'POST', url: 'alternative/data.json'},
+				getData: {method: 'GET', }
+			}
+    		this.resource = this.$resource('{node}/{another}.json', {}, custonActions);
 		}
     }
 </script>
